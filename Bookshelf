@@ -1,0 +1,85 @@
+#Siddarth Isaac Santamaria
+#INST 326 Section 0105
+#HW 2
+
+from argparse import ArgumentParser
+import sys
+
+def remove_punctuation(word):
+    """ Remove punctuation function, removes punctuation from string and returns lowercase
+    """
+    if not isinstance(word, str):
+        raise TypeError("Not a string")
+    word =  ''.join(x for x in word if x.isalpha())
+    if (word == ''):
+        return None
+    return (word.lower())
+    
+class Book:
+    def __init__(self, path):
+        self.words = []
+        with open(path, "r") as f:
+            for line in f:
+                for word in line.split():
+                    if remove_punctuation(word) != None:
+                        self.words.append(remove_punctuation(word))
+                
+    def unique_words(self):
+        """ iterates through books and finds unique words
+        """
+        w = []
+        for word in self.words:
+            if word not in w:
+                w.append(word)
+        self.words = w
+        return self.words
+      
+class Bookshelf:
+    def __init__(self):
+        self.index = {}
+        self.popularity_index = {}
+        
+    def add_books(self, text):
+        book1 = Book(text)
+        unique_words = book1.unique_words() 
+        for word in unique_words:
+            if word not in self.index:
+                self.index[word] = [text]
+            else:
+                self.index[word].append(text)
+            
+    def find_popularity(self):
+        self.popularity_index = {}
+        for key in self.index:
+            number = len(self.index[key])
+            if number not in self.popularity_index:
+                self.popularity_index[number] = [key]
+            else:
+                self.popularity_index[number].append(key)
+                
+def main(library):
+    Bookshelf1 = Bookshelf()
+    for book in library:
+        Bookshelf1.add_books(book)
+    Bookshelf1.find_popularity()
+    print(len(Bookshelf1.index))
+    return Bookshelf1.index, len(Bookshelf1.index), Bookshelf1.popularity_index
+
+def parse_args(args_list):
+     parser = ArgumentParser()
+     parser.add_argument("books", nargs = "+", type = str)
+     args = parser.parse_args(args_list)
+     return vars(args)["books"]
+ 
+if __name__ == "__main__":
+    try:
+        args = parse_args(sys.argv[1:])
+    except ValueError as e:
+        sys.exit(str(e))
+    main(args)
+
+
+
+
+
+
